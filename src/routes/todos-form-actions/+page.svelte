@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from '$app/forms';
   import type { ActionData, PageData } from './$types';
 
   export let data: PageData;
@@ -7,7 +8,7 @@
   $: ({ todos } = data);
 </script>
 
-<form method="post" action="?/addTodo">
+<form method="post" action="?/addTodo" use:enhance>
   <label>
     <span>Todo:</span>
     <input type="text" name="todo" />
@@ -32,7 +33,7 @@
   {#each todos as todo}
     <li>
       <span>{todo.text}</span>
-      <form method="post" action="?/removeTodo">
+      <form method="post" action="?/removeTodo" use:enhance>
         <input type="hidden" name="id" value={todo.id} />
         <button class="delete" type="submit"> 🧨 </button>
       </form>
@@ -57,7 +58,6 @@
     align-items: center;
   }
 
-  span,
   p {
     text-transform: capitalize;
   }
