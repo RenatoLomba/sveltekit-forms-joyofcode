@@ -1,0 +1,10 @@
+import { getTodos } from '$lib/server/database';
+import type { PageServerLoad } from './$types';
+
+export const load: PageServerLoad = async ({ depends }) => {
+  const todos = getTodos();
+
+  depends('todos');
+
+  return { todos };
+};
