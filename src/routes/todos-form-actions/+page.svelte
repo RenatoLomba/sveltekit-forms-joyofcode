@@ -1,24 +1,49 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import type { ActionData, PageData } from './$types';
+  import type { ActionData, PageData, SubmitFunction } from './$types';
 
   export let data: PageData;
   export let form: ActionData;
 
+  let loading = false;
+
   $: ({ todos } = data);
+
+  const addTodoInterceptor: SubmitFunction = ({ data, cancel }) => {
+    const todo = String(data.get('todo'));
+
+    if (!todo.trim()) {
+      form = { missing: true, todo: '' };
+      cancel();
+    }
+
+    loading = true;
+
+    return async ({ update }) => {
+      loading = false;
+      update();
+    };
+  };
 </script>
 
-<form method="post" action="?/addTodo" use:enhance>
+<form method="post" action="?/addTodo" use:enhance={addTodoInterceptor}>
   <label>
     <span>Todo:</span>
-    <input type="text" name="todo" />
+    <input
+      disabled={loading}
+      type="text"
+      name="todo"
+      value={form?.todo ?? ''}
+    />
 
     {#if !!form?.missing}
       <p class="error">This field is required.</p>
     {/if}
   </label>
 
-  <button type="submit">+ Add Todo</button>
+  <button aria-busy={loading} class:secondary={loading} type="submit"
+    >{loading ? '' : '+ Add Todo'}</button
+  >
 
   <button formaction="?/clearTodos" class="secondary" type="submit"
     >Clear</button
